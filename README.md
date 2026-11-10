@@ -1,6 +1,17 @@
 # Flowstate
 
-Flowstate is a focused Kanban workspace for SaaS product teams. It is a frontend portfolio project built as a complete product slice: typed domain logic, responsive UI, CRUD, optimistic updates, persistence, error recovery, tests and an optional Supabase backend.
+[Live demo](https://flowstate-one-kappa.vercel.app/) · [Source code](https://github.com/gencoz/flowstate) · [![CI](https://github.com/gencoz/flowstate/actions/workflows/ci.yml/badge.svg)](https://github.com/gencoz/flowstate/actions/workflows/ci.yml)
+
+Flowstate is a focused Kanban workspace for SaaS product teams. It is a frontend portfolio project built as a complete product slice: typed domain logic, responsive UI, CRUD, optimistic updates, persistence, error recovery, automated tests and a Supabase backend protected by Row Level Security.
+
+## Live project
+
+- **Try the product:** [flowstate-one-kappa.vercel.app](https://flowstate-one-kappa.vercel.app/)
+- **Review the code:** [github.com/gencoz/flowstate](https://github.com/gencoz/flowstate)
+- **Production data:** Supabase with anonymous authentication and per-user RLS policies
+- **Delivery:** Vercel deploys the production branch; GitHub Actions validates every push and pull request
+
+The live demo creates a temporary authenticated user in the browser. Tasks persist across reloads for that browser session and remain isolated from other visitors.
 
 ## Why this project exists
 
@@ -80,6 +91,16 @@ npm run build
 
 The portfolio-ready quality gate is: lint passes, all tests pass and the production build completes. GitHub Actions repeats this gate on every push and pull request.
 
+Current verified results:
+
+| Check | Result |
+| --- | --- |
+| ESLint | Passes with zero errors and zero warnings |
+| Automated tests | 7/7 passing |
+| Statement coverage | 94.11% |
+| Function coverage | 100% |
+| Production build | Next.js build completed successfully |
+
 The project currently stays on ESLint 9 because the lint plugins bundled with Next.js 16 declare compatibility with ESLint 9. Upgrade to ESLint 10 when that peer dependency range is officially supported.
 
 ## Data modes
@@ -124,8 +145,10 @@ Pure logic is tested first because it is fast and stable. UI tests are reserved 
 
 ## Portfolio presentation checklist
 
-- Deploy the demo and add its URL near the title.
+- [x] Deploy the demo and add its URL near the title.
+- [x] Link the public repository and live product.
+- [x] Publish an automated CI quality gate.
 - Add one desktop and one mobile screenshot.
-- Link the repository and live demo from your portfolio project card.
+- Link the repository and live demo from the portfolio project card.
 - Use `CASE_STUDY.md` as the basis for the project page and interview walkthrough.
 - Explain one trade-off and one failure state during the demo, not only the happy path.

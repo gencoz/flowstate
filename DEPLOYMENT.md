@@ -20,7 +20,9 @@ Do not deploy if any command fails.
 1. Create a new Supabase project.
 2. In Authentication settings, enable Anonymous Sign-Ins.
 3. For a public demo, enable CAPTCHA or Turnstile to limit anonymous-user abuse.
-4. Copy the project URL and publishable/anon key. Never use the service-role key in the browser.
+4. Set the Auth Site URL to `https://flowstate-one-kappa.vercel.app`.
+5. Add `https://flowstate-one-kappa.vercel.app/auth/callback` to the allowed redirect URLs.
+6. Copy the project URL and publishable/anon key. Never use the service-role key in the browser.
 
 ## 3. Apply the database migration
 

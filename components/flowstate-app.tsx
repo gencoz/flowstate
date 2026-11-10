@@ -15,12 +15,16 @@ import {
   Search,
   Settings,
   Sparkles,
+  UserRound,
   Users,
   X,
 } from "lucide-react";
+import { AccountDialog } from "./account-dialog";
 import { Board } from "./board";
 import { TaskDialog } from "./task-dialog";
+import { useAuthAccount } from "@/hooks/use-auth-account";
 import { initialTasks } from "@/lib/mock-data";
+import { getAccountInitials, getAccountLabel } from "@/lib/auth/account";
 import { filterTasks, getTaskTags } from "@/lib/tasks/task-filters";
 import type { Task, TaskFilters } from "@/lib/types";
 import { useTaskBoard } from "@/hooks/use-task-board";
@@ -36,6 +40,8 @@ export function FlowstateApp() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [dialogVersion, setDialogVersion] = useState(0);
+  const [accountDialogOpen, setAccountDialogOpen] = useState(false);
+  const auth = useAuthAccount(mode === "supabase" && loadState !== "loading");
 
   const closeDialog = useCallback(() => setDialog(null), []);
   const visibleTasks = useMemo(() => filterTasks(tasks, query, filters), [filters, query, tasks]);
@@ -86,7 +92,15 @@ export function FlowstateApp() {
           </div>
           <span className={`hidden rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] sm:inline-flex ${mode === "supabase" ? "bg-emerald-100 text-emerald-700" : "bg-violet-100 text-violet-700"}`}>{mode === "supabase" ? "Live sync" : "Demo mode"}</span>
           <button className="relative ml-auto grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="Notifications"><Bell size={18} /><span className="absolute right-2 top-2 size-1.5 rounded-full bg-violet-500" /></button>
-          <button className="hidden items-center gap-2 rounded-xl p-1.5 pr-2 text-sm font-semibold hover:bg-slate-50 sm:flex"><span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs text-white">AR</span>Alex <ChevronDown size={14} className="text-slate-400" /></button>
+          {mode === "supabase" ? (
+            <button onClick={() => setAccountDialogOpen(true)} className="flex items-center gap-2 rounded-xl p-1.5 text-sm font-semibold hover:bg-slate-50 sm:pr-2" aria-label="Open account settings">
+              <span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs text-white">{auth.state === "loading" ? "…" : getAccountInitials(auth.account)}</span>
+              <span className="hidden max-w-28 truncate sm:block">{auth.state === "loading" ? "Loading" : getAccountLabel(auth.account)}</span>
+              <ChevronDown size={14} className="hidden text-slate-400 sm:block" />
+            </button>
+          ) : (
+            <span className="hidden items-center gap-2 rounded-xl p-1.5 pr-2 text-sm font-semibold text-slate-500 sm:flex"><span className="grid size-8 place-items-center rounded-lg bg-slate-200"><UserRound size={15} /></span>Local demo</span>
+          )}
         </header>
 
         <div className="px-4 py-7 sm:px-7 lg:px-9 lg:py-9">
@@ -123,6 +137,8 @@ export function FlowstateApp() {
       </main>
 
       {dialog && <TaskDialog key={dialog.kind === "edit" ? dialog.task.id : `new-${dialogVersion}`} task={dialog.kind === "edit" ? dialog.task : null} onClose={closeDialog} onCreate={addTask} onUpdate={updateTask} onDelete={removeTask} />}
+
+      {accountDialogOpen && <AccountDialog account={auth.account} authError={auth.error} onClose={() => { auth.clearError(); setAccountDialogOpen(false); }} onLinkGuestEmail={auth.linkGuestEmail} onSendSignInLink={auth.sendSignInLink} onSignOut={auth.signOut} />}
 
       {error && <div role="alert" className="fixed bottom-5 right-5 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border border-rose-200 bg-white p-4 text-sm text-slate-700 shadow-2xl"><AlertCircle className="mt-0.5 shrink-0 text-rose-500" size={18} /><div><strong className="text-slate-900">We couldn’t save that change.</strong><p className="mt-0.5 text-xs text-slate-500">{error}</p></div><button onClick={clearError} aria-label="Dismiss error" className="ml-2 text-slate-400"><X size={16} /></button></div>}
     </div>

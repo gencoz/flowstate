@@ -31,6 +31,7 @@ Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product c
 - Responsive navigation and mobile board layout
 - Zero-setup demo persistence in `localStorage`
 - Optional Supabase persistence with anonymous auth and Row Level Security
+- Optional email upgrade that preserves a guest board and permanent-account magic-link sign-in
 - Reducer, filter and task-form tests
 
 ## Architecture
@@ -96,7 +97,7 @@ Current verified results:
 | Check | Result |
 | --- | --- |
 | ESLint | Passes with zero errors and zero warnings |
-| Automated tests | 7/7 passing |
+| Automated tests | 11/11 passing |
 | Statement coverage | 94.11% |
 | Function coverage | 100% |
 | Production build | Next.js build completed successfully |
@@ -118,8 +119,9 @@ NEXT_PUBLIC_DATA_MODE=demo
 1. Create a Supabase project.
 2. Run `supabase/migrations/001_create_tasks.sql` in the SQL editor or with the Supabase CLI.
 3. Enable Anonymous Sign-Ins in the project authentication settings.
-4. Copy `.env.example` to `.env.local`.
-5. Set the following values:
+4. Set the production Site URL to `https://flowstate-one-kappa.vercel.app` and allow `https://flowstate-one-kappa.vercel.app/auth/callback` as an Auth redirect URL.
+5. Copy `.env.example` to `.env.local`.
+6. Set the following values:
 
 ```env
 NEXT_PUBLIC_DATA_MODE=supabase
@@ -128,6 +130,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-or-anon-key
 ```
 
 Anonymous visitors receive an authenticated Supabase session. RLS policies restrict every task query to `auth.uid() = user_id`. For a public deployment, also enable CAPTCHA/Turnstile and plan cleanup of abandoned anonymous users as described in the [Supabase anonymous auth guide](https://supabase.com/docs/guides/auth/auth-anonymous).
+
+Guests can attach a new email to their existing anonymous identity, preserving the same user ID and tasks. Returning permanent users can request a magic link; the `/auth/callback` route exchanges the PKCE code and restores their board.
 
 ## Testing strategy
 

@@ -65,3 +65,37 @@ Questa roadmap non è una lista di feature casuali. Ogni fase dimostra una compe
 - La demo funziona senza account esterni.
 - Supabase può essere attivato senza cambiare i componenti.
 - Il repository contiene istruzioni, motivazioni e trade-off.
+
+## Milestone post-lancio ordinate per valore portfolio
+
+### 8. Account persistenti — completata
+
+**Obiettivo:** mantenere l'ingresso guest immediato, permettendo però di collegare una nuova email senza perdere i task e di recuperare un account esistente tramite magic link.
+
+**Perché:** mostra gestione reale di sessioni, PKCE, stati asincroni e sicurezza senza mettere attrito davanti al recruiter che apre la demo.
+
+**Risultato:** upgrade dell'identità anonima con `updateUser`, accesso passwordless, callback dedicata, logout e test UI.
+
+### 9. Workspace e progetti multipli — prossima
+
+**Obiettivo:** sostituire i workspace decorativi con entità reali, selezione del progetto e task isolati per progetto.
+
+**Perché:** è il passaggio che trasforma una singola board in un prodotto SaaS con un modello dati credibile.
+
+### 10. Pianificazione operativa
+
+**Obiettivo:** date ISO, task scaduti, vista “My work” e ordinamento utile.
+
+**Perché:** aggiunge valore quotidiano e dimostra gestione corretta di date, filtri derivati e stati vuoti.
+
+### 11. Activity log e collaborazione
+
+**Obiettivo:** registrare creazione, modifica, spostamento e completamento dei task.
+
+**Perché:** rende visibile la storia del prodotto e prepara commenti, membri e notifiche reali.
+
+### 12. Esperienza mobile e qualità end-to-end
+
+**Obiettivo:** interazioni touch, test E2E, audit accessibilità e performance.
+
+**Perché:** chiude il divario tra feature implementata e feature affidabile in produzione.

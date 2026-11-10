@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { AccountDialog } from "./account-dialog";
+import { ActivityPanel } from "./activity-panel";
 import { Board } from "./board";
 import { ProjectDialog } from "./project-dialog";
 import { TaskDialog } from "./task-dialog";
@@ -38,7 +39,7 @@ type DialogState = { kind: "create" } | { kind: "edit"; task: Task } | null;
 const defaultFilters: TaskFilters = { priority: "all", tag: "all", due: "all" };
 
 export function FlowstateApp() {
-  const { tasks, loadState, error, mode, addTask, updateTask, moveTask, removeTask, resetDemo, clearError } = useTaskBoard();
+  const { tasks, activity, loadState, error, mode, addTask, updateTask, moveTask, removeTask, resetDemo, clearError } = useTaskBoard();
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<TaskFilters>(defaultFilters);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -46,6 +47,7 @@ export function FlowstateApp() {
   const [dialogVersion, setDialogVersion] = useState(0);
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
   const auth = useAuthAccount(mode === "supabase" && loadState !== "loading");
   const projectState = useProjects(loadState === "ready");
 
@@ -99,7 +101,7 @@ export function FlowstateApp() {
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tasks..." aria-label="Search tasks" className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100" />
           </div>
           <span className={`hidden rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] sm:inline-flex ${mode === "supabase" ? "bg-emerald-100 text-emerald-700" : "bg-violet-100 text-violet-700"}`}>{mode === "supabase" ? "Live sync" : "Demo mode"}</span>
-          <button className="relative ml-auto grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="Notifications"><Bell size={18} /><span className="absolute right-2 top-2 size-1.5 rounded-full bg-violet-500" /></button>
+          <button onClick={() => setActivityOpen(true)} className="relative ml-auto grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="Open recent activity"><Bell size={18} />{activity.some((event) => event.projectId === projectState.activeProjectId) && <span className="absolute right-2 top-2 size-1.5 rounded-full bg-violet-500" />}</button>
           {mode === "supabase" ? (
             <button onClick={() => setAccountDialogOpen(true)} className="flex items-center gap-2 rounded-xl p-1.5 text-sm font-semibold hover:bg-slate-50 sm:pr-2" aria-label="Open account settings">
               <span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs text-white">{auth.state === "loading" ? "…" : getAccountInitials(auth.account)}</span>
@@ -151,6 +153,8 @@ export function FlowstateApp() {
       {accountDialogOpen && <AccountDialog account={auth.account} authError={auth.error} onClose={() => { auth.clearError(); setAccountDialogOpen(false); }} onLinkGuestEmail={auth.linkGuestEmail} onSendSignInLink={auth.sendSignInLink} onSignOut={auth.signOut} />}
 
       {projectDialogOpen && <ProjectDialog onClose={() => setProjectDialogOpen(false)} onCreate={projectState.addProject} />}
+
+      {activityOpen && <><button className="fixed inset-0 z-40 bg-slate-950/30 backdrop-blur-sm" onClick={() => setActivityOpen(false)} aria-label="Close activity overlay" /><ActivityPanel events={activity} projectId={projectState.activeProjectId} onClose={() => setActivityOpen(false)} /></>}
 
       {(error || projectState.error) && <div role="alert" className="fixed bottom-5 right-5 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border border-rose-200 bg-white p-4 text-sm text-slate-700 shadow-2xl"><AlertCircle className="mt-0.5 shrink-0 text-rose-500" size={18} /><div><strong className="text-slate-900">We couldn’t save that change.</strong><p className="mt-0.5 text-xs text-slate-500">{error || projectState.error}</p></div><button onClick={() => { clearError(); projectState.clearError(); }} aria-label="Dismiss error" className="ml-2 text-slate-400"><X size={16} /></button></div>}
     </div>

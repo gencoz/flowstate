@@ -31,6 +31,17 @@ export type Project = {
 
 export type ProjectDraft = Pick<Project, "name" | "description" | "color">;
 
+export type ActivityAction = "created" | "updated" | "moved" | "deleted";
+
+export type ActivityEvent = {
+  id: string;
+  projectId: string;
+  taskId: string;
+  taskTitle: string;
+  action: ActivityAction;
+  createdAt: string;
+};
+
 export type TaskDraft = Pick<
   Task,
   "title" | "description" | "status" | "priority" | "tags" | "dueDate"

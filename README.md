@@ -28,6 +28,7 @@ Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product c
 - Search across title, description, task ID and tags
 - Priority and tag filters with clear/reset behavior
 - ISO due dates with overdue/today indicators, operational filtering and legacy-date normalization
+- Persistent per-project activity history for task creation, updates, moves and deletion
 - Project metrics for total, active and completed work
 - Optimistic updates with rollback and visible error feedback
 - Responsive navigation and mobile board layout
@@ -99,7 +100,7 @@ Current verified results:
 | Check | Result |
 | --- | --- |
 | ESLint | Passes with zero errors and zero warnings |
-| Automated tests | 17/17 passing |
+| Automated tests | 18/18 passing |
 | Statement coverage | 94.44% |
 | Function coverage | 100% |
 | Production build | Next.js build completed successfully |

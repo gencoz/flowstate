@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Assignee, Task, TaskPriority, TaskStatus } from "@/lib/types";
+import type { ActivityAction, ActivityEvent, Assignee, Task, TaskPriority, TaskStatus } from "@/lib/types";
 import type { TaskRepository } from "./task-repository";
 import { normalizeStoredDueDate } from "./task-dates";
 
@@ -31,14 +31,22 @@ export class SupabaseTaskRepository implements TaskRepository {
     return ((data ?? []) as TaskRow[]).map(fromRow);
   }
 
+  async listActivity(): Promise<ActivityEvent[]> {
+    await this.ensureUser();
+    const { data, error } = await this.client.from("activity_events").select("*").order("created_at", { ascending: false }).limit(50);
+    if (error) throw error;
+    return (data ?? []).map((row) => ({ id: row.id, projectId: row.project_id, taskId: row.task_id, taskTitle: row.task_title, action: row.action, createdAt: row.created_at })) as ActivityEvent[];
+  }
+
   async create(task: Task): Promise<Task> {
     const userId = await this.ensureUser();
     const { data, error } = await this.client.from("tasks").insert(toRow(task, userId)).select("*").single();
     if (error) throw error;
+    await this.addActivity(task, "created", userId);
     return fromRow(data as TaskRow);
   }
 
-  async update(task: Task): Promise<Task> {
+  async update(task: Task, activityAction: Extract<ActivityAction, "updated" | "moved"> = "updated"): Promise<Task> {
     const userId = await this.ensureUser();
     const { data, error } = await this.client
       .from("tasks")
@@ -47,12 +55,20 @@ export class SupabaseTaskRepository implements TaskRepository {
       .select("*")
       .single();
     if (error) throw error;
+    await this.addActivity(task, activityAction, userId);
     return fromRow(data as TaskRow);
   }
 
   async remove(taskId: string): Promise<void> {
-    await this.ensureUser();
+    const userId = await this.ensureUser();
+    const { data: taskData } = await this.client.from("tasks").select("id,title,project_id").eq("id", taskId).single();
     const { error } = await this.client.from("tasks").delete().eq("id", taskId);
+    if (error) throw error;
+    if (taskData) await this.addActivity({ id: taskData.id, title: taskData.title, projectId: taskData.project_id } as Task, "deleted", userId);
+  }
+
+  private async addActivity(task: Pick<Task, "id" | "title" | "projectId">, action: ActivityAction, userId: string) {
+    const { error } = await this.client.from("activity_events").insert({ user_id: userId, project_id: task.projectId, task_id: task.id, task_title: task.title, action });
     if (error) throw error;
   }
 

@@ -92,13 +92,15 @@ Questa roadmap non è una lista di feature casuali. Ogni fase dimostra una compe
 
 **Risultato:** input data nativo, storage ISO, normalizzazione dei valori legacy, indicatori Today/Overdue, filtro temporale e metrica dei task scaduti.
 
-### 11. Activity log e collaborazione — prossima
+### 11. Activity log e collaborazione — completata
 
 **Obiettivo:** registrare creazione, modifica, spostamento e completamento dei task.
 
 **Perché:** rende visibile la storia del prodotto e prepara commenti, membri e notifiche reali.
 
-### 12. Esperienza mobile e qualità end-to-end
+**Risultato:** eventi persistenti per CRUD e spostamenti, storico separato per progetto, indice database, RLS e pannello attività responsive.
+
+### 12. Esperienza mobile e qualità end-to-end — prossima
 
 **Obiettivo:** interazioni touch, test E2E, audit accessibilità e performance.
 

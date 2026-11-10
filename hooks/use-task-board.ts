@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useRef, useState } from "react";
 import { initialTasks } from "@/lib/mock-data";
-import type { Task, TaskDraft, TaskStatus } from "@/lib/types";
+import type { ActivityAction, ActivityEvent, Task, TaskDraft, TaskStatus } from "@/lib/types";
 import { createTaskRepository } from "@/lib/tasks/create-task-repository";
 import { taskReducer } from "@/lib/tasks/task-reducer";
 import type { RepositoryMode, TaskRepository } from "@/lib/tasks/task-repository";
@@ -14,6 +14,7 @@ export function useTaskBoard() {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<RepositoryMode>("demo");
+  const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const repositoryRef = useRef<TaskRepository | null>(null);
 
   useEffect(() => {
@@ -21,11 +22,11 @@ export function useTaskBoard() {
     const repository = createTaskRepository(window.localStorage, initialTasks);
     repositoryRef.current = repository;
 
-    repository
-      .list()
-      .then((savedTasks) => {
+    Promise.all([repository.list(), repository.listActivity()])
+      .then(([savedTasks, savedActivity]) => {
         if (cancelled) return;
         dispatch({ type: "replace", tasks: savedTasks });
+        setActivity(savedActivity);
         setMode(repository.mode);
         setLoadState("ready");
       })
@@ -51,13 +52,13 @@ export function useTaskBoard() {
     await commit({ type: "add", task }, () => repositoryRef.current?.create(task));
   }
 
-  async function updateTask(task: Task) {
-    await commit({ type: "update", task }, () => repositoryRef.current?.update(task));
+  async function updateTask(task: Task, activityAction: Extract<ActivityAction, "updated" | "moved"> = "updated") {
+    await commit({ type: "update", task }, () => repositoryRef.current?.update(task, activityAction));
   }
 
   async function moveTask(taskId: string, status: TaskStatus) {
     const task = tasks.find((current) => current.id === taskId);
-    if (task) await updateTask({ ...task, status });
+    if (task) await updateTask({ ...task, status }, "moved");
   }
 
   async function removeTask(taskId: string) {
@@ -80,6 +81,7 @@ export function useTaskBoard() {
     dispatch(action);
     try {
       await persist();
+      repositoryRef.current?.listActivity().then(setActivity).catch(() => undefined);
     } catch (cause) {
       dispatch({ type: "replace", tasks: previousTasks });
       setError(toMessage(cause));
@@ -88,6 +90,7 @@ export function useTaskBoard() {
 
   return {
     tasks,
+    activity,
     loadState,
     error,
     mode,

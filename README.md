@@ -6,7 +6,7 @@ Flowstate is a focused Kanban workspace for SaaS product teams. It is a frontend
 
 Junior portfolios often show isolated screens. Flowstate demonstrates the decisions behind a real workflow: how data moves through the interface, what happens when persistence fails, how the same UI supports demo and production data, and how critical behavior is tested.
 
-Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product case study](./CASE_STUDY.md), the ready-to-use [portfolio copy](./PORTFOLIO_COPY.md) and the [deployment guide](./DEPLOYMENT.md).
+Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product case study](./CASE_STUDY.md), the ready-to-use [portfolio copy](./PORTFOLIO_COPY.md), the concise [deployment runbook](./DEPLOYMENT.md) and the beginner-friendly [step-by-step publishing guide](./JUNIOR_DEPLOYMENT_GUIDE.md).
 
 ## Product capabilities
 

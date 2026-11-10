@@ -23,7 +23,7 @@ Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product c
 
 - Three-column Kanban board with desktop drag and drop
 - Multiple persisted projects with project-specific boards and task counts
-- Accessible status selector as a non-drag alternative
+- Accessible status selector as a non-drag alternative, visible and touch-friendly on mobile
 - Create, edit and delete task workflow
 - Search across title, description, task ID and tags
 - Priority and tag filters with clear/reset behavior
@@ -35,7 +35,7 @@ Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product c
 - Zero-setup demo persistence in `localStorage`
 - Optional Supabase persistence with anonymous auth and Row Level Security
 - Optional email upgrade that preserves a guest board and permanent-account magic-link sign-in
-- Reducer, filter and task-form tests
+- Unit, component and browser end-to-end tests
 
 ## Architecture
 
@@ -90,6 +90,7 @@ npm install
 npm run lint
 npm run test
 npm run test:coverage
+npm run test:e2e
 npm run build
 ```
 
@@ -100,7 +101,8 @@ Current verified results:
 | Check | Result |
 | --- | --- |
 | ESLint | Passes with zero errors and zero warnings |
-| Automated tests | 18/18 passing |
+| Unit and component tests | 18/18 passing |
+| Browser E2E scenarios | 3/3 passing across desktop and mobile |
 | Statement coverage | 94.44% |
 | Function coverage | 100% |
 | Production build | Next.js build completed successfully |
@@ -141,12 +143,13 @@ Guests can attach a new email to their existing anonymous identity, preserving t
 - **Reducer tests** verify add, update and delete transitions without rendering React.
 - **Filter tests** verify search and combined filters as pure functions.
 - **Component test** completes the creation form through accessible labels and buttons.
+- **Browser E2E tests** verify project creation, task creation, status movement, metrics and activity history on desktop and mobile Chromium.
 
-Pure logic is tested first because it is fast and stable. UI tests are reserved for behavior the user directly experiences.
+Pure logic is tested first because it is fast and stable. Component tests protect focused interactions, while Playwright covers the most valuable complete user journey in a real browser. GitHub Actions installs Chromium and repeats the E2E suite for every push and pull request.
 
 ## Key trade-offs
 
-- Native drag and drop avoids a large dependency; touch-first reordering is a future enhancement.
+- Native drag and drop avoids a large dependency; mobile users get a visible status selector that does not depend on drag gestures.
 - ISO due dates keep storage predictable while localized labels and derived overdue states stay in pure, tested frontend logic.
 - Anonymous authentication makes the demo immediate; a team product would add durable accounts, invitations and roles.
 

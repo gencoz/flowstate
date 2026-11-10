@@ -20,6 +20,8 @@ yarn-debug.log*
 yarn-error.log*
 .vercel
 coverage
+playwright-report
+test-results
 supabase/.branches
 supabase/.temp
 *.tsbuildinfo

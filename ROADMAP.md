@@ -100,8 +100,16 @@ Questa roadmap non è una lista di feature casuali. Ogni fase dimostra una compe
 
 **Risultato:** eventi persistenti per CRUD e spostamenti, storico separato per progetto, indice database, RLS e pannello attività responsive.
 
-### 12. Esperienza mobile e qualità end-to-end — prossima
+### 12. Esperienza mobile e qualità end-to-end — completata
 
 **Obiettivo:** interazioni touch, test E2E, audit accessibilità e performance.
 
 **Perché:** chiude il divario tra feature implementata e feature affidabile in produzione.
+
+**Risultato:** selettore di stato touch visibile nelle card mobile, scenari Playwright su viewport desktop e Pixel 7, flusso completo verificato nel browser e suite E2E integrata nella CI con report scaricabile.
+
+### 13. Collaborazione reale — prossima
+
+**Obiettivo:** aggiungere membri del progetto, commenti sui task e notifiche essenziali.
+
+**Perché:** è la milestone successiva con più valore portfolio: dimostra autorizzazioni, relazioni tra utenti e dati, UI multiutente e aggiornamenti concorrenti senza appesantire il flusso principale.

@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
   test: {
     environment: "jsdom",
+    exclude: ["e2e/**", "node_modules/**", ".next/**"],
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       provider: "v8",

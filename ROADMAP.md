@@ -76,13 +76,15 @@ Questa roadmap non è una lista di feature casuali. Ogni fase dimostra una compe
 
 **Risultato:** upgrade dell'identità anonima con `updateUser`, accesso passwordless, callback dedicata, logout e test UI.
 
-### 9. Workspace e progetti multipli — prossima
+### 9. Workspace e progetti multipli — completata
 
 **Obiettivo:** sostituire i workspace decorativi con entità reali, selezione del progetto e task isolati per progetto.
 
 **Perché:** è il passaggio che trasforma una singola board in un prodotto SaaS con un modello dati credibile.
 
-### 10. Pianificazione operativa
+**Risultato:** progetti persistenti, creazione e selezione dalla sidebar, task isolati per progetto, repository locale/Supabase e migrazione retrocompatibile.
+
+### 10. Pianificazione operativa — prossima
 
 **Obiettivo:** date ISO, task scaduti, vista “My work” e ordinamento utile.
 

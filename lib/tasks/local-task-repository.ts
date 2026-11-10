@@ -19,7 +19,10 @@ export class LocalTaskRepository implements TaskRepository {
     }
 
     try {
-      return JSON.parse(saved) as Task[];
+      return (JSON.parse(saved) as Task[]).map((task) => ({
+        ...task,
+        projectId: task.projectId || "flowstate-launch",
+      }));
     } catch {
       this.write(this.seed);
       return this.seed;

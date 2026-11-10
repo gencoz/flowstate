@@ -22,6 +22,7 @@ Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product c
 ## Product capabilities
 
 - Three-column Kanban board with desktop drag and drop
+- Multiple persisted projects with project-specific boards and task counts
 - Accessible status selector as a non-drag alternative
 - Create, edit and delete task workflow
 - Search across title, description, task ID and tags
@@ -97,7 +98,7 @@ Current verified results:
 | Check | Result |
 | --- | --- |
 | ESLint | Passes with zero errors and zero warnings |
-| Automated tests | 11/11 passing |
+| Automated tests | 14/14 passing |
 | Statement coverage | 94.11% |
 | Function coverage | 100% |
 | Production build | Next.js build completed successfully |

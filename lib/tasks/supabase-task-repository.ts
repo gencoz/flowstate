@@ -4,6 +4,7 @@ import type { TaskRepository } from "./task-repository";
 
 type TaskRow = {
   id: string;
+  project_id: string;
   user_id: string;
   title: string;
   description: string;
@@ -68,6 +69,7 @@ export class SupabaseTaskRepository implements TaskRepository {
 function fromRow(row: TaskRow): Task {
   return {
     id: row.id,
+    projectId: row.project_id,
     title: row.title,
     description: row.description,
     status: row.status,
@@ -82,6 +84,7 @@ function fromRow(row: TaskRow): Task {
 function toRow(task: Task, userId: string): Omit<TaskRow, "created_at" | "updated_at"> {
   return {
     id: task.id,
+    project_id: task.projectId,
     user_id: userId,
     title: task.title,
     description: task.description,

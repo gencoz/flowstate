@@ -11,6 +11,7 @@ export type Assignee = {
 
 export type Task = {
   id: string;
+  projectId: string;
   title: string;
   description: string;
   status: TaskStatus;
@@ -20,6 +21,15 @@ export type Task = {
   assignees: Assignee[];
   comments: number;
 };
+
+export type Project = {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+};
+
+export type ProjectDraft = Pick<Project, "name" | "description" | "color">;
 
 export type TaskDraft = Pick<
   Task,

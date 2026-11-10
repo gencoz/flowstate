@@ -21,8 +21,10 @@ import {
 } from "lucide-react";
 import { AccountDialog } from "./account-dialog";
 import { Board } from "./board";
+import { ProjectDialog } from "./project-dialog";
 import { TaskDialog } from "./task-dialog";
 import { useAuthAccount } from "@/hooks/use-auth-account";
+import { useProjects } from "@/hooks/use-projects";
 import { initialTasks } from "@/lib/mock-data";
 import { getAccountInitials, getAccountLabel } from "@/lib/auth/account";
 import { filterTasks, getTaskTags } from "@/lib/tasks/task-filters";
@@ -41,14 +43,17 @@ export function FlowstateApp() {
   const [dialog, setDialog] = useState<DialogState>(null);
   const [dialogVersion, setDialogVersion] = useState(0);
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   const auth = useAuthAccount(mode === "supabase" && loadState !== "loading");
+  const projectState = useProjects(loadState === "ready");
 
   const closeDialog = useCallback(() => setDialog(null), []);
-  const visibleTasks = useMemo(() => filterTasks(tasks, query, filters), [filters, query, tasks]);
-  const tags = useMemo(() => getTaskTags(tasks), [tasks]);
-  const completed = tasks.filter((task) => task.status === "done").length;
-  const inProgress = tasks.filter((task) => task.status === "in-progress").length;
-  const completionRate = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+  const projectTasks = useMemo(() => tasks.filter((task) => task.projectId === projectState.activeProjectId), [projectState.activeProjectId, tasks]);
+  const visibleTasks = useMemo(() => filterTasks(projectTasks, query, filters), [filters, projectTasks, query]);
+  const tags = useMemo(() => getTaskTags(projectTasks), [projectTasks]);
+  const completed = projectTasks.filter((task) => task.status === "done").length;
+  const inProgress = projectTasks.filter((task) => task.status === "in-progress").length;
+  const completionRate = projectTasks.length ? Math.round((completed / projectTasks.length) * 100) : 0;
   const filtersActive = query.trim() || filters.priority !== "all" || filters.tag !== "all";
 
   function openCreateDialog() {
@@ -70,8 +75,8 @@ export function FlowstateApp() {
         </nav>
         <div className="mt-8 px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-600">Workspace</div>
         <div className="mt-3 space-y-1">
-          <button className="flex w-full items-center gap-3 rounded-xl bg-white/5 px-3 py-2.5 text-left text-sm text-white"><span className="size-2 rounded-full bg-violet-400" /> Product team</button>
-          <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-white/5 hover:text-white"><span className="size-2 rounded-full bg-amber-400" /> Marketing</button>
+          {projectState.projects.map((project) => <button key={project.id} onClick={() => projectState.setActiveProjectId(project.id)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${project.id === projectState.activeProjectId ? "bg-white/10 text-white" : "hover:bg-white/5 hover:text-white"}`}><span className={`size-2 rounded-full ${projectColor(project.color)}`} /><span className="truncate">{project.name}</span></button>)}
+          <button onClick={() => setProjectDialogOpen(true)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-400 hover:bg-white/5 hover:text-white"><Plus size={15} /> New project</button>
         </div>
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/[0.04] p-4">
           <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-white"><Sparkles size={14} className="text-violet-400" /> Portfolio demo</div>
@@ -106,9 +111,9 @@ export function FlowstateApp() {
         <div className="px-4 py-7 sm:px-7 lg:px-9 lg:py-9">
           <section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-500"><span>Projects</span><span>/</span><span className="text-slate-800">Flowstate launch</span></div>
-              <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em] text-slate-950 sm:text-4xl">Product roadmap</h1>
-              <p className="mt-2 text-sm text-slate-500">Plan, prioritize and ship the next version together.</p>
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-500"><span>Projects</span><span>/</span><span className="text-slate-800">{projectState.activeProject?.name}</span></div>
+              <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em] text-slate-950 sm:text-4xl">{projectState.activeProject?.name ?? "Product roadmap"}</h1>
+              <p className="mt-2 text-sm text-slate-500">{projectState.activeProject?.description ?? "Plan, prioritize and ship the next version together."}</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="hidden -space-x-2 sm:flex">{initialTasks.slice(0, 3).map((task) => <span key={task.id} title={task.assignees[0].name} className={`grid size-9 place-items-center rounded-full border-2 border-[#f6f7fb] text-[10px] font-bold ${task.assignees[0].color}`}>{task.assignees[0].initials}</span>)}<span className="grid size-9 place-items-center rounded-full border-2 border-[#f6f7fb] bg-white text-[10px] font-bold text-slate-500">+3</span></div>
@@ -117,7 +122,7 @@ export function FlowstateApp() {
           </section>
 
           <section className="mt-7 grid gap-3 sm:grid-cols-3" aria-label="Board summary">
-            <MetricCard icon={<FolderKanban size={17} />} label="Total tasks" value={String(tasks.length)} detail="Across this project" />
+            <MetricCard icon={<FolderKanban size={17} />} label="Total tasks" value={String(projectTasks.length)} detail="Across this project" />
             <MetricCard icon={<Clock3 size={17} />} label="In progress" value={String(inProgress)} detail="Currently active" accent="amber" />
             <MetricCard icon={<CheckCircle2 size={17} />} label="Completion" value={`${completionRate}%`} detail={`${completed} tasks shipped`} accent="emerald" />
           </section>
@@ -126,7 +131,7 @@ export function FlowstateApp() {
             <span className="px-1 text-xs font-extrabold uppercase tracking-[0.12em] text-slate-400">Filter</span>
             <FilterSelect label="Priority" value={filters.priority} onChange={(priority) => setFilters((current) => ({ ...current, priority: priority as TaskFilters["priority"] }))} options={["all", "high", "medium", "low"]} />
             <FilterSelect label="Tag" value={filters.tag} onChange={(tag) => setFilters((current) => ({ ...current, tag }))} options={["all", ...tags]} />
-            <p className="text-xs text-slate-400 sm:ml-auto">Showing <strong className="text-slate-700">{visibleTasks.length}</strong> of {tasks.length}</p>
+            <p className="text-xs text-slate-400 sm:ml-auto">Showing <strong className="text-slate-700">{visibleTasks.length}</strong> of {projectTasks.length}</p>
             {filtersActive && <button onClick={() => { setQuery(""); setFilters(defaultFilters); }} className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-violet-700 hover:bg-violet-50"><X size={13} /> Clear</button>}
             {mode === "demo" && <button onClick={() => void resetDemo()} className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100" title="Restore the original demo tasks"><RotateCcw size={13} /> Reset demo</button>}
           </section>
@@ -136,11 +141,13 @@ export function FlowstateApp() {
         </div>
       </main>
 
-      {dialog && <TaskDialog key={dialog.kind === "edit" ? dialog.task.id : `new-${dialogVersion}`} task={dialog.kind === "edit" ? dialog.task : null} onClose={closeDialog} onCreate={addTask} onUpdate={updateTask} onDelete={removeTask} />}
+      {dialog && <TaskDialog key={dialog.kind === "edit" ? dialog.task.id : `new-${dialogVersion}`} task={dialog.kind === "edit" ? dialog.task : null} onClose={closeDialog} onCreate={(draft) => addTask(draft, projectState.activeProjectId)} onUpdate={updateTask} onDelete={removeTask} />}
 
       {accountDialogOpen && <AccountDialog account={auth.account} authError={auth.error} onClose={() => { auth.clearError(); setAccountDialogOpen(false); }} onLinkGuestEmail={auth.linkGuestEmail} onSendSignInLink={auth.sendSignInLink} onSignOut={auth.signOut} />}
 
-      {error && <div role="alert" className="fixed bottom-5 right-5 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border border-rose-200 bg-white p-4 text-sm text-slate-700 shadow-2xl"><AlertCircle className="mt-0.5 shrink-0 text-rose-500" size={18} /><div><strong className="text-slate-900">We couldn’t save that change.</strong><p className="mt-0.5 text-xs text-slate-500">{error}</p></div><button onClick={clearError} aria-label="Dismiss error" className="ml-2 text-slate-400"><X size={16} /></button></div>}
+      {projectDialogOpen && <ProjectDialog onClose={() => setProjectDialogOpen(false)} onCreate={projectState.addProject} />}
+
+      {(error || projectState.error) && <div role="alert" className="fixed bottom-5 right-5 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border border-rose-200 bg-white p-4 text-sm text-slate-700 shadow-2xl"><AlertCircle className="mt-0.5 shrink-0 text-rose-500" size={18} /><div><strong className="text-slate-900">We couldn’t save that change.</strong><p className="mt-0.5 text-xs text-slate-500">{error || projectState.error}</p></div><button onClick={() => { clearError(); projectState.clearError(); }} aria-label="Dismiss error" className="ml-2 text-slate-400"><X size={16} /></button></div>}
     </div>
   );
 }
@@ -156,4 +163,8 @@ function MetricCard({ icon, label, value, detail, accent = "violet" }: { icon: R
 
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
   return <label className="flex items-center gap-2 text-xs font-semibold text-slate-500"><span className="sr-only">{label}</span><select value={value} onChange={(event) => onChange(event.target.value)} className="h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs font-semibold capitalize text-slate-700 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100">{options.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>;
+}
+
+function projectColor(color: string): string {
+  return { violet: "bg-violet-400", amber: "bg-amber-400", sky: "bg-sky-400", emerald: "bg-emerald-400" }[color] ?? "bg-slate-400";
 }

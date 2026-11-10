@@ -40,10 +40,11 @@ export function useTaskBoard() {
     };
   }, []);
 
-  async function addTask(draft: TaskDraft) {
+  async function addTask(draft: TaskDraft, projectId = "flowstate-launch") {
     const task: Task = {
       ...draft,
       id: getNextTaskId(tasks),
+      projectId,
       assignees: [{ name: "Alex Rivera", initials: "AR", color: "bg-slate-200 text-slate-800" }],
       comments: 0,
     };

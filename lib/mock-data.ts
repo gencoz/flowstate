@@ -1,4 +1,4 @@
-import type { Assignee, Column, Task } from "./types";
+import type { Assignee, Column, Project, Task } from "./types";
 
 const people: Record<string, Assignee> = {
   maya: { name: "Maya Chen", initials: "MC", color: "bg-violet-200 text-violet-800" },
@@ -12,9 +12,15 @@ export const columns: Column[] = [
   { id: "done", title: "Done", accent: "bg-emerald-500" },
 ];
 
+export const initialProjects: Project[] = [
+  { id: "flowstate-launch", name: "Flowstate launch", description: "Build and ship the portfolio-ready product.", color: "violet" },
+  { id: "marketing-site", name: "Marketing site", description: "Plan the launch narrative and supporting content.", color: "amber" },
+];
+
 export const initialTasks: Task[] = [
   {
     id: "FS-24",
+    projectId: "flowstate-launch",
     title: "Map the onboarding journey",
     description: "Turn research notes into a clear first-run experience.",
     status: "backlog",
@@ -26,6 +32,7 @@ export const initialTasks: Task[] = [
   },
   {
     id: "FS-25",
+    projectId: "flowstate-launch",
     title: "Draft empty states",
     description: "Create helpful copy and visuals for every empty view.",
     status: "backlog",
@@ -37,6 +44,7 @@ export const initialTasks: Task[] = [
   },
   {
     id: "FS-18",
+    projectId: "flowstate-launch",
     title: "Build command palette",
     description: "Let users jump between projects without leaving the keyboard.",
     status: "in-progress",
@@ -48,6 +56,7 @@ export const initialTasks: Task[] = [
   },
   {
     id: "FS-21",
+    projectId: "flowstate-launch",
     title: "Instrument product events",
     description: "Track activation steps and the weekly workflow loop.",
     status: "in-progress",
@@ -59,6 +68,7 @@ export const initialTasks: Task[] = [
   },
   {
     id: "FS-12",
+    projectId: "flowstate-launch",
     title: "Responsive board shell",
     description: "Make the workspace feel fast and natural on every screen.",
     status: "done",
@@ -70,6 +80,7 @@ export const initialTasks: Task[] = [
   },
   {
     id: "FS-15",
+    projectId: "flowstate-launch",
     title: "Define design tokens",
     description: "Align spacing, color, type and elevation across the product.",
     status: "done",

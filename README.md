@@ -27,6 +27,7 @@ Read the [implementation roadmap](./ROADMAP.md), the recruiter-facing [product c
 - Create, edit and delete task workflow
 - Search across title, description, task ID and tags
 - Priority and tag filters with clear/reset behavior
+- ISO due dates with overdue/today indicators, operational filtering and legacy-date normalization
 - Project metrics for total, active and completed work
 - Optimistic updates with rollback and visible error feedback
 - Responsive navigation and mobile board layout
@@ -98,8 +99,8 @@ Current verified results:
 | Check | Result |
 | --- | --- |
 | ESLint | Passes with zero errors and zero warnings |
-| Automated tests | 14/14 passing |
-| Statement coverage | 94.11% |
+| Automated tests | 17/17 passing |
+| Statement coverage | 94.44% |
 | Function coverage | 100% |
 | Production build | Next.js build completed successfully |
 
@@ -145,7 +146,7 @@ Pure logic is tested first because it is fast and stable. UI tests are reserved 
 ## Key trade-offs
 
 - Native drag and drop avoids a large dependency; touch-first reordering is a future enhancement.
-- Free-form due dates keep the MVP quick; a production version would store ISO dates and localize presentation.
+- ISO due dates keep storage predictable while localized labels and derived overdue states stay in pure, tested frontend logic.
 - Anonymous authentication makes the demo immediate; a team product would add durable accounts, invitations and roles.
 
 ## Portfolio presentation checklist

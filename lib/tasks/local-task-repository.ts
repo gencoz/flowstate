@@ -1,4 +1,5 @@
 import type { Task } from "@/lib/types";
+import { normalizeStoredDueDate } from "./task-dates";
 import type { TaskRepository } from "./task-repository";
 
 const STORAGE_KEY = "flowstate.tasks.v2";
@@ -22,6 +23,7 @@ export class LocalTaskRepository implements TaskRepository {
       return (JSON.parse(saved) as Task[]).map((task) => ({
         ...task,
         projectId: task.projectId || "flowstate-launch",
+        dueDate: normalizeStoredDueDate(task.dueDate),
       }));
     } catch {
       this.write(this.seed);

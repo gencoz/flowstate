@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "@/lib/types";
+import { toDateInputValue } from "@/lib/tasks/task-dates";
 
 type Props = {
   task: Task | null;
@@ -19,7 +20,7 @@ export function TaskDialog({ task, onClose, onCreate, onUpdate, onDelete }: Prop
   const [status, setStatus] = useState<TaskStatus>(task?.status ?? "backlog");
   const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "medium");
   const [tags, setTags] = useState(task?.tags.join(", ") ?? "");
-  const [dueDate, setDueDate] = useState(task?.dueDate ?? "No date");
+  const [dueDate, setDueDate] = useState(toDateInputValue(task?.dueDate ?? ""));
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -45,7 +46,7 @@ export function TaskDialog({ task, onClose, onCreate, onUpdate, onDelete }: Prop
         .split(",")
         .map((tag) => tag.trim())
         .filter(Boolean),
-      dueDate: dueDate.trim() || "No date",
+      dueDate: dueDate || "No date",
     };
 
     setSaving(true);
@@ -108,7 +109,7 @@ export function TaskDialog({ task, onClose, onCreate, onUpdate, onDelete }: Prop
             </label>
             <label className="text-xs font-bold text-slate-700">
               Due date
-              <input value={dueDate} onChange={(event) => setDueDate(event.target.value)} placeholder="e.g. Nov 20" className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 text-sm font-normal outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100" />
+              <input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 text-sm font-normal outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100" />
             </label>
           </div>
 

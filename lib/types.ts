@@ -39,6 +39,7 @@ export type TaskDraft = Pick<
 export type TaskFilters = {
   priority: TaskPriority | "all";
   tag: string | "all";
+  due?: "all" | "overdue" | "today" | "upcoming" | "none";
 };
 
 export type Column = {

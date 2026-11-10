@@ -1,4 +1,5 @@
 import type { Task, TaskFilters } from "@/lib/types";
+import { matchesDueFilter } from "./task-dates";
 
 export function filterTasks(tasks: Task[], query: string, filters: TaskFilters): Task[] {
   const normalizedQuery = query.trim().toLowerCase();
@@ -11,8 +12,9 @@ export function filterTasks(tasks: Task[], query: string, filters: TaskFilters):
       );
     const matchesPriority = filters.priority === "all" || task.priority === filters.priority;
     const matchesTag = filters.tag === "all" || task.tags.includes(filters.tag);
+    const matchesDueDate = matchesDueFilter(task.dueDate, filters.due ?? "all");
 
-    return matchesQuery && matchesPriority && matchesTag;
+    return matchesQuery && matchesPriority && matchesTag && matchesDueDate;
   });
 }
 

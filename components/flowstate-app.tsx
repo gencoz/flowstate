@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   AlertCircle,
+  AlertTriangle,
   Bell,
   CheckCircle2,
   ChevronDown,
@@ -28,12 +29,13 @@ import { useProjects } from "@/hooks/use-projects";
 import { initialTasks } from "@/lib/mock-data";
 import { getAccountInitials, getAccountLabel } from "@/lib/auth/account";
 import { filterTasks, getTaskTags } from "@/lib/tasks/task-filters";
+import { getDueDateMeta } from "@/lib/tasks/task-dates";
 import type { Task, TaskFilters } from "@/lib/types";
 import { useTaskBoard } from "@/hooks/use-task-board";
 
 type DialogState = { kind: "create" } | { kind: "edit"; task: Task } | null;
 
-const defaultFilters: TaskFilters = { priority: "all", tag: "all" };
+const defaultFilters: TaskFilters = { priority: "all", tag: "all", due: "all" };
 
 export function FlowstateApp() {
   const { tasks, loadState, error, mode, addTask, updateTask, moveTask, removeTask, resetDemo, clearError } = useTaskBoard();
@@ -53,8 +55,9 @@ export function FlowstateApp() {
   const tags = useMemo(() => getTaskTags(projectTasks), [projectTasks]);
   const completed = projectTasks.filter((task) => task.status === "done").length;
   const inProgress = projectTasks.filter((task) => task.status === "in-progress").length;
+  const overdue = projectTasks.filter((task) => task.status !== "done" && getDueDateMeta(task.dueDate).state === "overdue").length;
   const completionRate = projectTasks.length ? Math.round((completed / projectTasks.length) * 100) : 0;
-  const filtersActive = query.trim() || filters.priority !== "all" || filters.tag !== "all";
+  const filtersActive = query.trim() || filters.priority !== "all" || filters.tag !== "all" || filters.due !== "all";
 
   function openCreateDialog() {
     setDialogVersion((version) => version + 1);
@@ -121,9 +124,10 @@ export function FlowstateApp() {
             </div>
           </section>
 
-          <section className="mt-7 grid gap-3 sm:grid-cols-3" aria-label="Board summary">
+          <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Board summary">
             <MetricCard icon={<FolderKanban size={17} />} label="Total tasks" value={String(projectTasks.length)} detail="Across this project" />
             <MetricCard icon={<Clock3 size={17} />} label="In progress" value={String(inProgress)} detail="Currently active" accent="amber" />
+            <MetricCard icon={<AlertTriangle size={17} />} label="Overdue" value={String(overdue)} detail="Needs attention" accent="rose" />
             <MetricCard icon={<CheckCircle2 size={17} />} label="Completion" value={`${completionRate}%`} detail={`${completed} tasks shipped`} accent="emerald" />
           </section>
 
@@ -131,6 +135,7 @@ export function FlowstateApp() {
             <span className="px-1 text-xs font-extrabold uppercase tracking-[0.12em] text-slate-400">Filter</span>
             <FilterSelect label="Priority" value={filters.priority} onChange={(priority) => setFilters((current) => ({ ...current, priority: priority as TaskFilters["priority"] }))} options={["all", "high", "medium", "low"]} />
             <FilterSelect label="Tag" value={filters.tag} onChange={(tag) => setFilters((current) => ({ ...current, tag }))} options={["all", ...tags]} />
+            <FilterSelect label="Due date" value={filters.due ?? "all"} onChange={(due) => setFilters((current) => ({ ...current, due: due as NonNullable<TaskFilters["due"]> }))} options={["all", "overdue", "today", "upcoming", "none"]} />
             <p className="text-xs text-slate-400 sm:ml-auto">Showing <strong className="text-slate-700">{visibleTasks.length}</strong> of {projectTasks.length}</p>
             {filtersActive && <button onClick={() => { setQuery(""); setFilters(defaultFilters); }} className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-violet-700 hover:bg-violet-50"><X size={13} /> Clear</button>}
             {mode === "demo" && <button onClick={() => void resetDemo()} className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100" title="Restore the original demo tasks"><RotateCcw size={13} /> Reset demo</button>}
@@ -156,8 +161,8 @@ function SidebarLink({ icon, label, active = false }: { icon: React.ReactNode; l
   return <button className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${active ? "bg-violet-500/15 text-violet-300" : "hover:bg-white/5 hover:text-white"}`}>{icon}{label}{active && <span className="ml-auto size-1.5 rounded-full bg-violet-400" />}</button>;
 }
 
-function MetricCard({ icon, label, value, detail, accent = "violet" }: { icon: React.ReactNode; label: string; value: string; detail: string; accent?: "violet" | "amber" | "emerald" }) {
-  const colors = { violet: "bg-violet-50 text-violet-600", amber: "bg-amber-50 text-amber-600", emerald: "bg-emerald-50 text-emerald-600" };
+function MetricCard({ icon, label, value, detail, accent = "violet" }: { icon: React.ReactNode; label: string; value: string; detail: string; accent?: "violet" | "amber" | "rose" | "emerald" }) {
+  const colors = { violet: "bg-violet-50 text-violet-600", amber: "bg-amber-50 text-amber-600", rose: "bg-rose-50 text-rose-600", emerald: "bg-emerald-50 text-emerald-600" };
   return <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4"><span className={`grid size-10 place-items-center rounded-xl ${colors[accent]}`}>{icon}</span><div><p className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400">{label}</p><div className="mt-0.5 flex items-baseline gap-2"><strong className="font-display text-xl font-extrabold">{value}</strong><span className="text-[11px] text-slate-400">{detail}</span></div></div></div>;
 }
 

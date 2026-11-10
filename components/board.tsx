@@ -1,7 +1,8 @@
 "use client";
 
-import { GripVertical, MessageCircle, MoreHorizontal, Plus } from "lucide-react";
+import { CalendarClock, GripVertical, MessageCircle, MoreHorizontal, Plus } from "lucide-react";
 import { columns } from "@/lib/mock-data";
+import { getDueDateMeta } from "@/lib/tasks/task-dates";
 import type { Task, TaskPriority, TaskStatus } from "@/lib/types";
 
 type BoardProps = {
@@ -46,6 +47,8 @@ export function Board({ tasks, onMoveTask, onAddTask, onOpenTask }: BoardProps) 
 }
 
 function TaskCard({ task, onMove, onOpen }: { task: Task; onMove: (id: string, status: TaskStatus) => void; onOpen: (task: Task) => void }) {
+  const dueDate = getDueDateMeta(task.dueDate);
+  const dueClass = dueDate.state === "overdue" && task.status !== "done" ? "bg-rose-50 text-rose-700" : dueDate.state === "today" && task.status !== "done" ? "bg-amber-50 text-amber-700" : "text-slate-400";
   return (
     <article draggable onDragStart={(event) => event.dataTransfer.setData("text/plain", task.id)} className="group cursor-grab rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg hover:shadow-slate-200/60 active:cursor-grabbing">
       <div className="flex items-center justify-between gap-3">
@@ -59,7 +62,7 @@ function TaskCard({ task, onMove, onOpen }: { task: Task; onMove: (id: string, s
       <div className="mt-4 flex flex-wrap gap-1.5">{task.tags.map((tag) => <span key={tag} className="rounded-md bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-700">{tag}</span>)}</div>
       <div className="mt-5 flex items-center border-t border-slate-100 pt-3.5">
         <div className="flex -space-x-1.5">{task.assignees.map((person) => <span key={person.name} title={person.name} className={`grid size-7 place-items-center rounded-full border-2 border-white text-[8px] font-extrabold ${person.color}`}>{person.initials}</span>)}</div>
-        <span className="ml-auto text-[11px] font-semibold text-slate-400">{task.dueDate}</span>
+        <span className={`ml-auto inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-semibold ${dueClass}`}><CalendarClock size={12} />{dueDate.label}</span>
         <span className="ml-3 flex items-center gap-1 text-[11px] font-semibold text-slate-400"><MessageCircle size={13} />{task.comments}</span>
       </div>
     </article>

@@ -84,13 +84,15 @@ Questa roadmap non è una lista di feature casuali. Ogni fase dimostra una compe
 
 **Risultato:** progetti persistenti, creazione e selezione dalla sidebar, task isolati per progetto, repository locale/Supabase e migrazione retrocompatibile.
 
-### 10. Pianificazione operativa — prossima
+### 10. Pianificazione operativa — completata
 
 **Obiettivo:** date ISO, task scaduti, vista “My work” e ordinamento utile.
 
 **Perché:** aggiunge valore quotidiano e dimostra gestione corretta di date, filtri derivati e stati vuoti.
 
-### 11. Activity log e collaborazione
+**Risultato:** input data nativo, storage ISO, normalizzazione dei valori legacy, indicatori Today/Overdue, filtro temporale e metrica dei task scaduti.
+
+### 11. Activity log e collaborazione — prossima
 
 **Obiettivo:** registrare creazione, modifica, spostamento e completamento dei task.
 

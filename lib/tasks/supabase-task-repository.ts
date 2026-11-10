@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Assignee, Task, TaskPriority, TaskStatus } from "@/lib/types";
 import type { TaskRepository } from "./task-repository";
+import { normalizeStoredDueDate } from "./task-dates";
 
 type TaskRow = {
   id: string;
@@ -75,7 +76,7 @@ function fromRow(row: TaskRow): Task {
     status: row.status,
     priority: row.priority,
     tags: row.tags,
-    dueDate: row.due_date,
+    dueDate: normalizeStoredDueDate(row.due_date),
     assignees: row.assignees,
     comments: row.comments,
   };
